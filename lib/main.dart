@@ -1,48 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'services/db_helper.dart';
+import 'package:ecopatrol_mobile/models/report_model.dart';
+import 'providers/session_provider.dart';
+import 'screens/login_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/form_report_screen.dart';
+import 'screens/list_report_screen.dart';
+import 'screens/detail_report_screen.dart';
+import 'screens/edit_report_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Init Database
-  await DBHelper.init();
-
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoggedIn = ref.watch(sessionProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "EcoPatrol",
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4CAF50), // Hijau biar cocok eco theme
-        ),
-        useMaterial3: true,
-      ),
 
-routes: {
-  "/list": (_) => const ListReportScreen(),
-}
+      home: isLoggedIn ? const ListReportScreen() : const LoginScreen(),
 
-      // Nanti diganti ke LoginScreen (Mahasiswa 1)
-      home: const Scaffold(
-        body: Center(
-          child: Text(
-            "EcoPatrol App",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
+      routes: {
+        "/login": (_) => const LoginScreen(),
+        "/settings": (_) => const SettingsScreen(),
+        "/form": (_) => const FormReportScreen(),
+        "/list": (_) => const ListReportScreen(),
+      },
+
+      onGenerateRoute: (settings) {
+        if (settings.name == "/detail") {
+          final report = settings.arguments as ReportModel?;
+
+          if (report == null) return null;
+
+          return MaterialPageRoute(
+            builder: (_) => DetailReportScreen(report: report),
+          );
+        }
+
+        if (settings.name == "/edit") {
+          final report = settings.arguments as ReportModel?;
+          if (report == null) return null;
+
+          return MaterialPageRoute(
+            builder: (_) => EditReportScreen(report: report),
+          );
+        }
+
+        return null;
+      },
     );
   }
 }

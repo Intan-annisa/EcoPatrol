@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ecopatrol_mobile/models/report_model.dart';
+import 'package:ecopatrol_mobile/services/db_helper.dart';
+import 'edit_report_screen.dart';
 
 class DetailReportScreen extends StatelessWidget {
   final ReportModel report;
@@ -13,12 +15,14 @@ class DetailReportScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Detail Laporan"),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // FOTO BESAR
+
+            // FOTO
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.file(
@@ -28,6 +32,7 @@ class DetailReportScreen extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
+
             const SizedBox(height: 20),
 
             // JUDUL
@@ -38,6 +43,7 @@ class DetailReportScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+
             const SizedBox(height: 10),
 
             // TANGGAL
@@ -45,6 +51,7 @@ class DetailReportScreen extends StatelessWidget {
               "Tanggal: ${report.date}",
               style: TextStyle(color: Colors.grey[700]),
             ),
+
             const SizedBox(height: 20),
 
             // DESKRIPSI
@@ -59,7 +66,7 @@ class DetailReportScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // LOKASI
+            // KOORDINAT
             const Text(
               "Lokasi:",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -68,74 +75,74 @@ class DetailReportScreen extends StatelessWidget {
             Text("Longitude : ${report.longitude}"),
 
             const SizedBox(height: 30),
+
+            // TOMBOL EDIT
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final refresh = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditReportScreen(report: report),
+                    ),
+                  );
+
+                  if (refresh == true) {
+                    Navigator.pop(context); // kembali agar reload list
+                  }
+                },
+                child: const Text("Edit Laporan"),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // TOMBOL DELETE
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                onPressed: () async {
+                  final confirm = await showDialog(
+                    context: context,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: const Text("Hapus Laporan"),
+                        content: const Text("Yakin ingin menghapus laporan ini?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("Batal"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text("Hapus"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirm == true) {
+                    final db = DBHelper();
+                    await db.deleteReport(report.id!);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Laporan dihapus")),
+                    );
+
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text("Hapus Laporan"),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-const SizedBox(height: 30),
-// TOMBOL EDIT
-SizedBox(
-  width: double.infinity,
-  child: ElevatedButton(
-    onPressed: () async {
-      final refresh = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => EditReportScreen(report: report),
-        ),
-      );
-
-      // jika selesai edit → refresh halaman detail
-      if (refresh == true) {
-        Navigator.pop(context); // kembali ke list agar reload
-      }
-    },
-    child: const Text("Edit Laporan"),
-  ),
-),
-
-const SizedBox(height: 12),
-
-// TOMBOL DELETE
-SizedBox(
-  width: double.infinity,
-  child: ElevatedButton(
-    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-    onPressed: () async {
-      final confirm = await showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-          title: const Text("Hapus Laporan"),
-          content: const Text("Yakin ingin menghapus laporan ini?"),
-          actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Batal"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus"),
-          ),
-        ],
-      );
-    },
-  );
-
-  if (confirm == true) {
-      final db = DBHelper();
-      await db.deleteReport(report.id!);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Laporan dihapus")),
-      );
-
-      Navigator.pop(context); // kembali ke list
-    }
-  },
-  child: const Text("Hapus Laporan"),
-  ),
-),

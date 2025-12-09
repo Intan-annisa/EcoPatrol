@@ -1,5 +1,5 @@
 name: ecopatrol_mobile
-description: "A new Flutter project."
+description: "A Flutter project with Firebase integration"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,26 +10,30 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # icon
+  # Icons
   cupertino_icons: ^1.0.8
 
-  # state management
+  # State management
   flutter_riverpod: ^2.5.0
 
-  # local storage
+  # Local storage
   shared_preferences: ^2.3.2
 
-  # db
-  sqflite: ^2.3.0
-  path: ^1.9.0
+  # Firebase (VERSI KOMPATIBEL)
+  firebase_core: ^2.25.5
+  cloud_firestore: ^4.15.5
+  firebase_storage: ^11.0.16
+  firebase_auth: ^4.17.8
+  firebase_analytics: ^10.8.0
+  firebase_database: ^10.4.10
 
-  # kamera
+  # Kamera
   image_picker: ^1.1.2
 
-  # gps
+  # GPS
   geolocator: ^11.0.0
 
-  # permission
+  # Permission
   permission_handler: ^11.0.1
 
 dev_dependencies:

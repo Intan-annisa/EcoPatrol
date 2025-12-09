@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ecopatrol_mobile/services/camera_service.dart';
 import 'package:ecopatrol_mobile/services/location_service.dart';
-import 'package:ecopatrol_mobile/services/db_helper.dart';
+import 'package:ecopatrol_mobile/services/db_firebase.dart';
 import 'package:ecopatrol_mobile/models/report_model.dart';
 
 class FormReportScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _FormReportScreenState extends State<FormReportScreen> {
   double? longitude;
 
   bool _loadingLocation = false;
-  final db = DBHelper();
+  final db = DBFirebase();
 
   // Ambil gambar dari kamera
   Future<void> _pickImage() async {

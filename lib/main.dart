@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ecopatrol_mobile/models/report_model.dart';
+
 import 'providers/session_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/settings_screen.dart';
@@ -24,13 +25,16 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       title: "EcoPatrol",
 
-      home: isLoggedIn ? const ListReportScreen() : const LoginScreen(),
+      home: isLoggedIn
+          ? ListReportScreen(reports: [])
+          : const LoginScreen(),
 
       routes: {
         "/login": (_) => const LoginScreen(),
         "/settings": (_) => const SettingsScreen(),
         "/form": (_) => const FormReportScreen(),
-        "/list": (_) => const ListReportScreen(),
+
+        "/list": (_) => ListReportScreen(reports: []),
       },
 
       onGenerateRoute: (settings) {
@@ -46,6 +50,7 @@ class MyApp extends ConsumerWidget {
 
         if (settings.name == "/edit") {
           final report = settings.arguments as ReportModel?;
+
           if (report == null) return null;
 
           return MaterialPageRoute(

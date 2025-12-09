@@ -1,43 +1,41 @@
 class ReportModel {
-  final int? id;
-  final String title;
-  final String description;
-  final String photoPath;
-  final double latitude;
-  final double longitude;
-  final int status; // 0 = pending, 1 = selesai
+  int? id;
+  String title;
+  String description;
+  String imagePath;
+  double latitude;
+  double longitude;
+  String date;
 
   ReportModel({
     this.id,
     required this.title,
     required this.description,
-    required this.photoPath,
+    required this.imagePath,
     required this.latitude,
     required this.longitude,
-    this.status = 0,
+    required this.date,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'photoPath': photoPath,
-      'latitude': latitude,
-      'longitude': longitude,
-      'status': status,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    "title": title,
+    "description": description,
+    "imagePath": imagePath,
+    "latitude": latitude,
+    "longitude": longitude,
+    "date": date,
+  };
 
   factory ReportModel.fromMap(Map<String, dynamic> map) {
     return ReportModel(
-      id: map['id'],
-      title: map['title'],
-      description: map['description'],
-      photoPath: map['photoPath'],
-      latitude: map['latitude'],
-      longitude: map['longitude'],
-      status: map['status'],
+      id: map["id"],
+      title: map["title"],
+      description: map["description"],
+      imagePath: map["imagePath"],
+      latitude: map["latitude"],
+      longitude: map["longitude"],
+      date: map["date"],
     );
   }
 }

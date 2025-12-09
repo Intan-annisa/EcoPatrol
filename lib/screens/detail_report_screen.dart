@@ -74,3 +74,68 @@ class DetailReportScreen extends StatelessWidget {
     );
   }
 }
+
+const SizedBox(height: 30),
+// TOMBOL EDIT
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: () async {
+      final refresh = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EditReportScreen(report: report),
+        ),
+      );
+
+      // jika selesai edit → refresh halaman detail
+      if (refresh == true) {
+        Navigator.pop(context); // kembali ke list agar reload
+      }
+    },
+    child: const Text("Edit Laporan"),
+  ),
+),
+
+const SizedBox(height: 12),
+
+// TOMBOL DELETE
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+    onPressed: () async {
+      final confirm = await showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+          title: const Text("Hapus Laporan"),
+          content: const Text("Yakin ingin menghapus laporan ini?"),
+          actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus"),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (confirm == true) {
+      final db = DBHelper();
+      await db.deleteReport(report.id!);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Laporan dihapus")),
+      );
+
+      Navigator.pop(context); // kembali ke list
+    }
+  },
+  child: const Text("Hapus Laporan"),
+  ),
+),

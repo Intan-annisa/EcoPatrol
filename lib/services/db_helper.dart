@@ -38,4 +38,24 @@ class DBHelper {
     final res = await db.query("reports", orderBy: "id DESC");
     return res.map((e) => ReportModel.fromMap(e)).toList();
   }
+
+  Future<int> updateReport(ReportModel report) async {
+    final db = await database;
+    return await db.update(
+      "reports",
+      report.toMap(),
+      where: "id = ?",
+      whereArgs: [report.id],
+    );
+  }
+
+  Future<int> deleteReport(int id) async {
+    final db = await database;
+    return await db.delete(
+      "reports",
+      where: "id = ?",
+      whereArgs: [id],
+    );
+  }
+
 }

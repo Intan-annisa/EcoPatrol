@@ -1,3 +1,4 @@
+
 class ReportModel {
   int? id;
   String title;
@@ -7,6 +8,12 @@ class ReportModel {
   double longitude;
   String date;
 
+  // --- TAMBAHAN UNTUK OFFICER (Mahasiswa 4) ---
+  String status; // "pending" atau "completed"
+  String? completionNotes;     // deskripsi tindakan saat selesai
+  String? completionPhotoPath; // path foto hasil pengerjaan
+  String? completedAt;         // timestamp penyelesaian
+
   ReportModel({
     this.id,
     required this.title,
@@ -15,6 +22,10 @@ class ReportModel {
     required this.latitude,
     required this.longitude,
     required this.date,
+    this.status = "pending", // default: belum selesai
+    this.completionNotes,
+    this.completionPhotoPath,
+    this.completedAt,
   });
 
   Map<String, dynamic> toMap() => {
@@ -25,6 +36,10 @@ class ReportModel {
     "latitude": latitude,
     "longitude": longitude,
     "date": date,
+    "status": status,
+    "completionNotes": completionNotes,
+    "completionPhotoPath": completionPhotoPath,
+    "completedAt": completedAt,
   };
 
   factory ReportModel.fromMap(Map<String, dynamic> map) {
@@ -36,6 +51,10 @@ class ReportModel {
       latitude: map["latitude"],
       longitude: map["longitude"],
       date: map["date"],
+      status: map["status"] ?? "pending",
+      completionNotes: map["completionNotes"],
+      completionPhotoPath: map["completionPhotoPath"],
+      completedAt: map["completedAt"],
     );
   }
 }

@@ -30,6 +30,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
+routes: {
+  "/list": (_) => const ListReportScreen(),
+}
+
       // Nanti diganti ke LoginScreen (Mahasiswa 1)
       home: const Scaffold(
         body: Center(

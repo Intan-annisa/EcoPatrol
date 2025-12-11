@@ -24,7 +24,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _loadReports() async {
-    final data = await db.getAllReports();
+    final data = await db.getReports();
     setState(() {
       reports = data;
     });

@@ -33,24 +33,15 @@ class _FormReportScreenState extends State<FormReportScreen> {
   }
 
   Future<void> _getLocation() async {
-    if (_loadingLocation) return;
-
     setState(() => _loadingLocation = true);
 
-    try {
-      final pos = await LocationService.getCurrentLocation();
+    final pos = await LocationService.getCurrentLocation();
 
-      setState(() {
-        latitude = pos.latitude;
-        longitude = pos.longitude;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
-      setState(() => _loadingLocation = false);
-    }
+    setState(() {
+      latitude = pos.latitude;
+      longitude = pos.longitude;
+      _loadingLocation = false;
+    });
   }
 
   Future<void> _saveReport() async {
@@ -86,86 +77,120 @@ class _FormReportScreenState extends State<FormReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(title: const Text("Buat Laporan")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
-            const Text("Judul Laporan", style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(hintText: "Judul laporan"),
-            ),
-
-            const SizedBox(height: 16),
-
-            const Text("Deskripsi", style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(
-              controller: _descController,
-              maxLines: 4,
-              decoration: const InputDecoration(hintText: "Deskripsi laporan"),
-            ),
-
-            const SizedBox(height: 16),
-
-            const Text("Foto Bukti", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-
-            imageFile == null
-                ? Container(
-              height: 200,
-              width: double.infinity,
-              color: Colors.grey[300],
-              child: const Center(child: Text("Belum ada foto")),
-            )
-                : Image.file(imageFile!, height: 200),
-
-            const SizedBox(height: 8),
-
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.camera_alt),
-              label: const Text("Ambil Foto"),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text("Lokasi", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-
-            _loadingLocation
-                ? const Center(child: CircularProgressIndicator())
-                : latitude == null
-                ? const Text("Belum ada lokasi")
-                : Text(
-              "Latitude : $latitude\nLongitude: $longitude",
-            ),
-
-            const SizedBox(height: 8),
-
-            ElevatedButton.icon(
-              onPressed: _loadingLocation ? null : _getLocation,
-              icon: const Icon(Icons.location_on),
-              label: Text(
-                _loadingLocation ? "Mengambil lokasi..." : "Ambil Lokasi",
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveReport,
-                child: const Padding(
-                  padding: EdgeInsets.all(14),
-                  child: Text("Simpan Laporan"),
+                const Text("Judul Laporan"),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    hintText: "Contoh: Sampah menumpuk",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
-              ),
+
+                const SizedBox(height: 16),
+
+                const Text("Deskripsi"),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _descController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: "Jelaskan kondisi di lapangan",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text("Foto Bukti"),
+                const SizedBox(height: 10),
+                Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: imageFile == null
+                      ? const Center(child: Text("Belum ada foto"))
+                      : ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(imageFile!, fit: BoxFit.cover),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text("Ambil Foto"),
+                    onPressed: _pickImage,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text("Lokasi"),
+                const SizedBox(height: 8),
+
+                _loadingLocation
+                    ? const Center(child: CircularProgressIndicator())
+                    : Text(
+                  latitude == null
+                      ? "Lokasi belum diambil"
+                      : "Lat: $latitude\nLong: $longitude",
+                ),
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.location_on),
+                    label: const Text("Ambil Lokasi"),
+                    onPressed: _getLocation,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: _saveReport,
+                    child: const Text("Simpan Laporan"),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

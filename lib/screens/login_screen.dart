@@ -11,32 +11,93 @@ class LoginScreen extends ConsumerWidget {
     final passwordController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(labelText: "Username"),
+      backgroundColor: const Color(0xFFF2F4F8),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Card(
+              elevation: 6,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.lock_outline,
+                      size: 56,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    TextField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        labelText: "Username",
+                        prefixIcon: const Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        prefixIcon: const Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "LOGIN",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          if (usernameController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) {
+                            ref.read(sessionProvider.notifier).login();
+                            Navigator.pushReplacementNamed(
+                                context, "/settings");
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: "Password"),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              child: const Text("Login"),
-              onPressed: () {
-                if (usernameController.text.isNotEmpty &&
-                    passwordController.text.isNotEmpty) {
-                  ref.read(sessionProvider.notifier).login();
-                  Navigator.pushReplacementNamed(context, "/settings");
-                }
-              },
-            )
-          ],
+          ),
         ),
       ),
     );

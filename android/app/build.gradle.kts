@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.ecopatrol_mobile"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.ecopatrol_mobile"
-        minSdk = 21
-        targetSdk = 34
+        minSdk = flutter.minSdkVersion
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
     }

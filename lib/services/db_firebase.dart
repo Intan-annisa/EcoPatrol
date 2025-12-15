@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-import '../models/report_model.dart';
+import'package:ecopatrol_mobile/models/report_model.dart';
 
 class DBFirebase {
   final DatabaseReference _db =

@@ -49,11 +49,9 @@ class _EditReportScreenState extends State<EditReportScreen> {
 
             ElevatedButton(
               onPressed: () {
-                // UPDATE DATA
                 widget.report.title = titleCtrl.text;
                 widget.report.description = descCtrl.text;
 
-                // KEMBALIKAN KE SCREEN SEBELUMNYA
                 Navigator.pop(context, widget.report);
               },
               child: const Text("Simpan"),

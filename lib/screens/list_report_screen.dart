@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ecopatrol_mobile/models/report_model.dart';
-import 'package:ecopatrol_mobile/services/db_firebase.dart';
+import 'package:ecopatrol_mobile/services/db_helper.dart';
 import 'detail_report_screen.dart';
 
 class ListReportScreen extends StatefulWidget {

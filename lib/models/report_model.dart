@@ -1,4 +1,3 @@
-
 class ReportModel {
   int? id;
   String title;
@@ -7,12 +6,10 @@ class ReportModel {
   double latitude;
   double longitude;
   String date;
-
-  // --- TAMBAHAN UNTUK OFFICER (Mahasiswa 4) ---
-  String status; // "pending" atau "completed"
-  String? completionNotes;     // deskripsi tindakan saat selesai
-  String? completionPhotoPath; // path foto hasil pengerjaan
-  String? completedAt;         // timestamp penyelesaian
+  String status;
+  String? completionNotes;
+  String? completionPhotoPath;
+  String? completedAt;
 
   ReportModel({
     this.id,
@@ -21,40 +18,44 @@ class ReportModel {
     required this.imagePath,
     required this.latitude,
     required this.longitude,
-    required this.date,
-    this.status = "pending", // default: belum selesai
+    String? date, // Tidak pakai `this.date`
+    this.status = 'pending',
     this.completionNotes,
     this.completionPhotoPath,
     this.completedAt,
-  });
+  }) : date = (date?.isEmpty == true)
+      ? DateTime.now().toIso8601String()
+      : date ?? DateTime.now().toIso8601String();
 
-  Map<String, dynamic> toMap() => {
-    "id": id,
-    "title": title,
-    "description": description,
-    "imagePath": imagePath,
-    "latitude": latitude,
-    "longitude": longitude,
-    "date": date,
-    "status": status,
-    "completionNotes": completionNotes,
-    "completionPhotoPath": completionPhotoPath,
-    "completedAt": completedAt,
-  };
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'imagePath': imagePath,
+      'latitude': latitude,
+      'longitude': longitude,
+      'date': date,
+      'status': status,
+      'completionNotes': completionNotes,
+      'completionPhotoPath': completionPhotoPath,
+      'completedAt': completedAt,
+    };
+  }
 
   factory ReportModel.fromMap(Map<String, dynamic> map) {
     return ReportModel(
-      id: map["id"],
-      title: map["title"],
-      description: map["description"],
-      imagePath: map["imagePath"],
-      latitude: map["latitude"],
-      longitude: map["longitude"],
-      date: map["date"],
-      status: map["status"] ?? "pending",
-      completionNotes: map["completionNotes"],
-      completionPhotoPath: map["completionPhotoPath"],
-      completedAt: map["completedAt"],
+      id: map['id'] as int?,
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      imagePath: map['imagePath'] ?? '',
+      latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
+      date: map['date'] as String?,
+      status: map['status'] ?? 'pending',
+      completionNotes: map['completionNotes'] as String?,
+      completionPhotoPath: map['completionPhotoPath'] as String?,
+      completedAt: map['completedAt'] as String?,
     );
   }
 }

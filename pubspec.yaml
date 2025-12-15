@@ -1,39 +1,26 @@
 name: ecopatrol_mobile
-description: "A Flutter project with Firebase integration"
+description: "A Flutter project with SQFlite for local storage"
 publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
-
+  sdk: '^3.9.2'
 dependencies:
   flutter:
     sdk: flutter
 
-  # Icons
   cupertino_icons: ^1.0.8
 
-  # State management
   flutter_riverpod: ^2.5.0
 
-  # Local storage
   shared_preferences: ^2.3.2
 
-  # Firebase (VERSI KOMPATIBEL)
-  firebase_core: ^2.25.5
-  cloud_firestore: ^4.15.5
-  firebase_storage: ^11.0.16
-  firebase_auth: ^4.17.8
-  firebase_analytics: ^10.8.0
-  firebase_database: ^10.4.10
+  sqflite: ^2.3.0
+  path: ^1.8.0
+  path_provider: ^2.1.2
 
-  # Kamera
   image_picker: ^1.1.2
-
-  # GPS
   geolocator: ^11.0.0
-
-  # Permission
   permission_handler: ^11.0.1
 
 dev_dependencies:

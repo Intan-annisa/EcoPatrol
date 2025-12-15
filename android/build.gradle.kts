@@ -1,6 +1,6 @@
 plugins {
-    // Firebase plugin dependency untuk app-level
-    id("com.google.gms.google-services") version "4.4.4" apply false
+    id("com.android.application") version "8.9.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
 }
 
 allprojects {
@@ -10,7 +10,6 @@ allprojects {
     }
 }
 
-// Optional: pindahkan build directory ke luar root
 val newBuildDir = rootProject.layout.buildDirectory.dir("../../build").get()
 rootProject.layout.buildDirectory.value(newBuildDir)
 

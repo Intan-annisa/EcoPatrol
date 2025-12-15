@@ -1,8 +1,7 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services") // apply plugin Google Services
 }
 
 android {
@@ -16,6 +15,8 @@ android {
         versionCode = 1
         versionName = "1.0.0"
     }
+
+    buildToolsVersion = "36.0.0"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -38,12 +39,5 @@ flutter {
 }
 
 dependencies {
-    // Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-
-    // Firebase products
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-storage")
-    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.material:material:1.12.0")
 }

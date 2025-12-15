@@ -1,25 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/shared_prefs_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SessionNotifier extends StateNotifier<bool> {
-  SessionNotifier() : super(false) {
-    _loadSession();
+final sessionProvider = AsyncNotifierProvider.autoDispose<SessionNotifier, bool>(
+      () => SessionNotifier(),
+);
+
+class SessionNotifier extends AutoDisposeAsyncNotifier<bool> {
+  late SharedPreferences _prefs;
+
+  @override
+  Future<bool> build() async {
+    _prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = _prefs.getBool('isLoggedIn') ?? false;
+    return isLoggedIn;
   }
 
-  void _loadSession() async {
-    state = await SharedPrefsService.getLoginStatus();
+  Future<void> login() async {
+    await _prefs.setBool('isLoggedIn', true);
+    state = const AsyncData(true);
   }
 
-  void login() {
-    state = true;
-    SharedPrefsService.saveLoginStatus(true);
-  }
-
-  void logout() {
-    state = false;
-    SharedPrefsService.saveLoginStatus(false);
+  Future<void> logout() async {
+    await _prefs.setBool('isLoggedIn', false);
+    state = const AsyncData(false);
   }
 }
-
-final sessionProvider =
-StateNotifierProvider<SessionNotifier, bool>((ref) => SessionNotifier());

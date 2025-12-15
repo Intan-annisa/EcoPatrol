@@ -1,196 +1,135 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ecopatrol_mobile/models/report_model.dart';
+import 'package:ecopatrol_mobile/providers/session_provider.dart';
 import 'package:ecopatrol_mobile/services/camera_service.dart';
 import 'package:ecopatrol_mobile/services/location_service.dart';
-import 'package:ecopatrol_mobile/services/db_firebase.dart';
-import 'package:ecopatrol_mobile/models/report_model.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:ecopatrol_mobile/services/db_helper.dart';
 
-class FormReportScreen extends StatefulWidget {
+class FormReportScreen extends ConsumerStatefulWidget {
   const FormReportScreen({super.key});
 
   @override
-  State<FormReportScreen> createState() => _FormReportScreenState();
+  ConsumerState<FormReportScreen> createState() => _FormReportScreenState();
 }
 
-class _FormReportScreenState extends State<FormReportScreen> {
+class _FormReportScreenState extends ConsumerState<FormReportScreen> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
 
-  File? imageFile;
-  double? latitude;
-  double? longitude;
+  File? _imageFile;
+  double? _lat, _long;
 
   bool _loadingLocation = false;
-  final db = DBFirebase();
+  bool _saving = false;
 
   Future<void> _pickImage() async {
     final picked = await CameraService.pickImageFromCamera();
     if (picked != null) {
-      setState(() {
-        imageFile = File(picked.path);
-      });
+      setState(() => _imageFile = File(picked.path));
     }
   }
 
   Future<void> _getLocation() async {
     setState(() => _loadingLocation = true);
-
-    final pos = await LocationService.getCurrentLocation();
-
-    setState(() {
-      latitude = pos.latitude;
-      longitude = pos.longitude;
-      _loadingLocation = false;
-    });
+    try {
+      final pos = await LocationService.getCurrentLocation();
+      setState(() {
+        _lat = pos.latitude;
+        _long = pos.longitude;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _loadingLocation = false);
+    }
   }
 
   Future<void> _saveReport() async {
+    if (_saving) return;
     if (_titleController.text.isEmpty ||
         _descController.text.isEmpty ||
-        imageFile == null ||
-        latitude == null ||
-        longitude == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Semua data wajib diisi")),
-      );
+        _imageFile == null ||
+        _lat == null ||
+        _long == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lengkapi semua data")));
       return;
     }
 
-    final report = ReportModel(
-      title: _titleController.text,
-      description: _descController.text,
-      imagePath: imageFile!.path,
-      latitude: latitude!,
-      longitude: longitude!,
-      date: DateTime.now().toString(),
-    );
+    setState(() => _saving = true);
 
-    await db.insertReport(report);
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final newPath = '${appDir.path}/$fileName';
+      await _imageFile!.copy(newPath);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Laporan berhasil disimpan")),
-    );
+      final report = ReportModel(
+        title: _titleController.text.trim(),
+        description: _descController.text.trim(),
+        imagePath: newPath,
+        latitude: _lat!,
+        longitude: _long!,
+      );
 
-    Navigator.pop(context);
+      final db = DBHelper();
+      await db.insertReport(report);
+
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("✅ Laporan berhasil disimpan")));
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Gagal: $e")));
+    } finally {
+      setState(() => _saving = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(title: const Text("Buat Laporan")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                const Text("Judul Laporan"),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    hintText: "Contoh: Sampah menumpuk",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                const Text("Deskripsi"),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: _descController,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    hintText: "Jelaskan kondisi di lapangan",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text("Foto Bukti"),
-                const SizedBox(height: 10),
-                Container(
-                  height: 180,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: imageFile == null
-                      ? const Center(child: Text("Belum ada foto"))
-                      : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(imageFile!, fit: BoxFit.cover),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text("Ambil Foto"),
-                    onPressed: _pickImage,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                const Text("Lokasi"),
-                const SizedBox(height: 8),
-
-                _loadingLocation
-                    ? const Center(child: CircularProgressIndicator())
-                    : Text(
-                  latitude == null
-                      ? "Lokasi belum diambil"
-                      : "Lat: $latitude\nLong: $longitude",
-                ),
-
-                const SizedBox(height: 10),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.location_on),
-                    label: const Text("Ambil Lokasi"),
-                    onPressed: _getLocation,
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: _saveReport,
-                    child: const Text("Simpan Laporan"),
-                  ),
-                ),
-              ],
+        child: Column(
+          children: [
+            TextField(controller: _titleController, decoration: const InputDecoration(labelText: "Judul")),
+            const SizedBox(height: 12),
+            TextField(controller: _descController, maxLines: 4, decoration: const InputDecoration(labelText: "Deskripsi")),
+            const SizedBox(height: 16),
+            _imageFile == null
+                ? const Text("Belum ada foto")
+                : Image.file(_imageFile!, height: 180, width: double.infinity, fit: BoxFit.cover),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.camera_alt),
+              label: const Text("Ambil Foto"),
+              onPressed: _pickImage,
             ),
-          ),
+            const SizedBox(height: 16),
+            _loadingLocation
+                ? const CircularProgressIndicator()
+                : Text(_lat == null ? "Lokasi belum diambil" : "Lat: $_lat\nLong: $_long"),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.location_on),
+              label: const Text("Ambil Lokasi"),
+              onPressed: _getLocation,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _saveReport,
+                child: _saving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Simpan Laporan"),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:ecopatrol_mobile/providers/session_provider.dart';
+import 'package:ecopatrol_mobile/screens/login_screen.dart';
+import 'package:ecopatrol_mobile/screens/dashboard_screen.dart';
 
-import 'providers/session_provider.dart';
-import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -22,15 +13,31 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoggedIn = ref.watch(sessionProvider);
+    final sessionState = ref.watch(sessionProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'EcoPatrol',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        useMaterial3: true,
+      ),
+      home: sessionState.when(
+        data: (isLoggedIn) {
+          return isLoggedIn ? const DashboardScreen() : const LoginScreen();
+        },
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, _) => Scaffold(
+          body: Center(child: Text('Error: $err')),
+        ),
+      ),
 
-      home: isLoggedIn
-          ? const DashboardScreen()
-          : const LoginScreen(),
+      routes: {
+        '/login': (_) => const LoginScreen(),
+        '/dashboard': (_) => const DashboardScreen(),
+      },
     );
   }
 }

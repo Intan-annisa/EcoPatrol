@@ -11,7 +11,7 @@ class ListReportScreen extends StatefulWidget {
 }
 
 class _ListReportScreenState extends State<ListReportScreen> {
-  final DBFirebase db = DBFirebase();
+  final DBHelper db = DBHelper();
   List<ReportModel> reports = [];
   bool loading = true;
 

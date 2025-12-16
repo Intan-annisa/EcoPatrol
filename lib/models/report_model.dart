@@ -18,7 +18,7 @@ class ReportModel {
     required this.imagePath,
     required this.latitude,
     required this.longitude,
-    String? date, // Tidak pakai `this.date`
+    String? date,
     this.status = 'pending',
     this.completionNotes,
     this.completionPhotoPath,
